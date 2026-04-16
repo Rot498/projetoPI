@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <aside class="sidebar">
+    <h2>StreetCar</h2>
+    <ul>
+  <li class="active">📊 Dashboard</li>
+  <li onclick="ir('veiculos.html')">🚗Veículos</li>
+  <li onclick="ir('clientes.html')">👤 Clientes</li>
+  <li onclick="ir('locacoes.html')">📄 Locações</li>
+  <li onclick="ir('reservas.html')">📅 Reservas</li>
+  <li onclick="logout()">🚪 Sair</li>
+</ul>
+  </aside>
+
+  <main class="main">
+
+    <!-- TOPO -->
+    <div class="topo">
+      <h1>Visão Geral do Dashboard</h1>
+      <div id="userName" class="user"></div>
+    </div>
+
+    <!-- 🔥 CARDS MELHORADOS -->
+    <div class="cards">
+
+      <div class="card-small destaque">
+  <div class="card-header">
+    <span>Total Frota</span>
+    <span>🚗</span>
+  </div>
+  <h2 id="totalVeiculos">0</h2>
+  <p>Veículos</p>
+</div>
+
+<div class="card-small destaque">
+  <div class="card-header">
+    <span>Locações</span>
+    <span>📄</span>
+  </div>
+  <h2 id="totalLocacoes">0</h2>
+  <p>Ativas</p>
+</div>
+
+<div class="card-small destaque">
+  <div class="card-header">
+    <span>Reservas</span>
+    <span>📅</span>
+  </div>
+  <h2 id="totalReservas">0</h2>
+  <p>Pendentes</p>
+</div>
+
+<div class="card-small destaque">
+  <div class="card-header">
+    <span>Faturamento</span>
+    <span>💰</span>
+  </div>
+  <h2 id="faturamentoTotal">R$ 0</h2>
+  <p>Total</p>
+</div>
+
+    </div>
+
+    <!-- DUAS TABELAS -->
+    <div class="duas-tabelas">
+
+  <!-- Frota -->
+  <div class="tabela">
+    <h2>Frota Ativa</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Modelo</th>
+          <th>Placa</th>
+          <th>Ano</th>
+          <th>Cliente</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody id="tabelaFrota"></tbody>
+    </table>
+  </div>
+
+  <!-- Devoluções -->
+  <div class="tabela">
+
+    <div class="topo-tabela">
+      <h2>Devoluções</h2>
+
+      <div class="acoes">
+        <button onclick="ir('locacoes.html')">+ Nova Locação</button>
+        <button onclick="ir('veiculos.html')">+ Novo Veículo</button>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Veículo</th>
+          <th>Data</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody id="tabelaDevolucoes"></tbody>
+    </table>
+
+  </div>
+
+</div>
+
+  </main>
+
+</div>
+
+<script src="js/script.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  verificarLogin();
+</script>
+
+</body>
+</html>
