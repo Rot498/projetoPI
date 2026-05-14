@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Clientes</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2>StreetCar</h2>
+    <ul>
+  <li onclick="ir('dashboard.html')">📊 Dashboard</li>
+  <li onclick="ir('veiculos.html')">🚗Veículos</li>
+  <li class="active">👤 Clientes</li>
+  <li onclick="ir('locacoes.html')">📄 Locações</li>
+  <li onclick="ir('reservas.html')">📅 Reservas</li>
+  <li onclick="logout()">🚪 Sair</li>
+    </ul>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topo">
+      <h1>Clientes</h1>
+      <div id="userName" class="user"></div>
+    </div>
+
+    <!-- CADASTRO -->
+    <div class="tabela">
+      <h2>Cadastrar Cliente</h2>
+
+      <div class="form-cliente">
+        <input type="text" id="nome" placeholder="Nome">
+        <input type="email" id="email" placeholder="E-mail">
+        <input type="text" id="telefone" placeholder="Telefone">
+
+        <button onclick="salvarCliente()">Salvar</button>
+      </div>
+    </div>
+
+    <!-- LISTA -->
+    <div class="tabela">
+      <h2>Lista de Clientes</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+        <tbody id="listaClientes"></tbody>
+      </table>
+    </div>
+
+  </main>
+
+</div>
+
+<script src="js/script.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/clientes.js"></script>
+
+<script>
+  verificarLogin();
+</script>
+
+</body>
+</html>

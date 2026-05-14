@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Locações</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <aside class="sidebar">
+    <h2>StreetCar</h2>
+    <ul>
+  <li onclick="ir('dashboard.html')">📊 Dashboard</li>
+  <li onclick="ir('veiculos.html')">🚗Veículos</li>
+  <li onclick="ir('clientes.html')">👤 Clientes</li>
+  <li class="active">📄 Locações</li>
+  <li onclick="ir('reservas.html')">📅 Reservas</li>
+  <li onclick="logout()">🚪 Sair</li>
+    </ul>
+  </aside>
+
+  <main class="main">
+
+    <div class="topo">
+      <h1>Locações</h1>
+      <div id="userName" class="user"></div>
+    </div>
+
+    <!-- FORM -->
+    <div class="tabela">
+      <h2>Nova Locação</h2>
+
+      <div class="form-locacao">
+
+  <select id="cliente"></select>
+
+  <select id="veiculo"></select>
+
+  <div class="campo-data">
+    <label>Início</label>
+    <input type="date" id="inicio">
+  </div>
+
+  <div class="campo-data">
+    <label>Devolução</label>
+    <input type="date" id="fim">
+  </div>
+
+        <button onclick="salvarLocacao()">Salvar</button>
+      </div>
+    </div>
+
+    <!-- LISTA -->
+    <div class="tabela">
+      <h2>Histórico de Locações</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Veículo</th>
+            <th>Início</th>
+            <th>Fim</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+        <tbody id="listaLocacoes"></tbody>
+      </table>
+    </div>
+
+  </main>
+
+</div>
+
+<script src="js/script.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/locacoes.js"></script>
+
+<script>
+  verificarLogin();
+</script>
+
+</body>
+</html>

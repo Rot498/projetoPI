@@ -1,0 +1,323 @@
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #1e1e2f;
+  color: white;
+}
+
+/* CENTRALIZAÇÃO LOGIN */
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* CARD LOGIN/CADASTRO */
+.card {
+  background: #393A43;
+  padding: 30px;
+  border-radius: 12px;
+  width: 300px;
+  text-align: center;
+}
+
+.card h2 {
+  color: #F1560A;
+}
+
+/* INPUT GLOBAL */
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: #F1560A;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+/* DASHBOARD */
+.container {
+  display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  background: #333333;
+  height: 100vh;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar h2 {
+  color: #F1560A;
+  margin: 0 0 15px 0;
+  font-size: 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin: 3px 0;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar li:hover {
+  background: #444;
+}
+
+.sidebar .active {
+  background: #1f1f1f;
+  color: #F1560A;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 25px;
+}
+
+/* TOPO */
+.topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.user {
+  background: #333;
+  padding: 8px 15px;
+  border-radius: 20px;
+}
+
+/* CARDS */
+.cards {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.card-small {
+  background: #393A43;
+  padding: 20px;
+  border-radius: 10px;
+  flex: 1;
+}
+
+.card-small.destaque {
+  border-left: 4px solid #F1560A;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.card-small h2 {
+  margin: 10px 0 5px;
+}
+
+/* TABELAS */
+.duas-tabelas {
+  display: flex;
+  gap: 20px;
+}
+
+.tabela {
+  flex: 1;
+  min-width: 0;
+  background: #393A43;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+/* TOPO TABELA */
+.topo-tabela {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topo-tabela .acoes {
+  display: flex;
+  gap: 10px;
+}
+
+.topo-tabela button {
+  width: auto;
+  padding: 6px 12px;
+}
+
+/* TABELA */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  color: #F1560A;
+}
+
+thead tr {
+  border-bottom: 1px solid #555;
+}
+
+tbody tr {
+  border-bottom: 1px solid #555;
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+/* BADGES */
+.badge {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.verde {
+  background: #00c853;
+}
+
+.laranja {
+  background: #F1560A;
+}
+
+/* FORM VEICULO */
+.form-veiculo,
+.form-cliente {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  align-items: center;
+}
+
+.form-veiculo input,
+.form-cliente input {
+  flex: 1;
+}
+
+.form-veiculo button,
+.form-cliente button {
+  width: auto;
+  padding: 10px 20px;
+}
+
+/* FORM LOCAÇÃO */
+.form-locacao {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.form-locacao select {
+  background: #2c2d38;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  min-width: 180px;
+}
+
+.form-locacao input {
+  width: auto;
+  flex: none;
+}
+
+/* DATAS */
+.campo-data {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.campo-data label {
+  font-size: 11px;
+  color: #aaa;
+}
+
+.campo-data input {
+  background: #2c2d38;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  width: 150px;
+}
+
+/* BOTÃO LOCAÇÃO */
+.form-locacao button {
+  width: auto;
+  padding: 10px 20px;
+  height: 40px;
+}
+
+/* BOTÕES DE AÇÃO */
+.acoes-botoes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* linha de cima */
+.acoes-botoes .linha-botoes {
+  display: flex;
+  gap: 6px;
+}
+
+/* botões padrão */
+.acoes-botoes button {
+  width: auto;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+/* botão excluir */
+.btn-excluir {
+  background: #ff4d4d;
+  width: 100%;
+}
+
+.btn-excluir:hover {
+  background: #e60000;
+}
