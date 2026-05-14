@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Reservas - StreetCar</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <h2>StreetCar</h2>
+    <ul>
+      <li onclick="ir('dashboard.html')">📊 Dashboard</li>
+      <li onclick="ir('veiculos.html')">🚗 Veículos</li>
+      <li onclick="ir('clientes.html')">👤 Clientes</li>
+      <li onclick="ir('locacoes.html')">📄 Locações</li>
+      <li class="active">📅 Reservas</li>
+      <li onclick="logout()">🚪 Sair</li>
+    </ul>
+    <div class="badge-perfil">👑 ADMINISTRADOR</div>
+  </aside>
+  <main class="main">
+    <div class="topo">
+      <h1>Reservas</h1>
+      <div id="userName" class="user"></div>
+    </div>
+
+    <div class="tabela">
+      <h2>Lista de Reservas</h2>
+      <table>
+        <thead>
+          <tr><th>Cliente</th><th>Veículo</th><th>Início</th><th>Fim</th><th>Status</th><th>Ações</th></tr>
+        </thead>
+        <tbody id="tabelaReservas"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  const sessao = verificarLogin("ADMIN");
+  if (sessao) {
+    document.getElementById("userName").innerText = "👤 " + sessao.nome;
+    carregar();
+  }
+
+  async function carregar() {
+    const reservas = await apiGetReservas();
+    const tbody = document.getElementById("tabelaReservas");
+    tbody.innerHTML = reservas.map(r => `
+      <tr>
+        <td>${r.cliente?.nome || "-"}</td>
+        <td>${r.veiculo?.modelo || "-"}</td>
+        <td>${r.dataInicio}</td>
+        <td>${r.dataFim}</td>
+        <td><span class="badge ${r.status === 'Pendente' ? 'laranja' : r.status === 'Confirmada' ? 'verde' : 'cinza'}">${r.status}</span></td>
+        <td>
+          ${r.status === 'Pendente' ? `
+            <button onclick="confirmar(${r.id})" style="width:auto;padding:5px 10px;font-size:12px;">✅ Confirmar</button>
+            <button onclick="cancelar(${r.id})" style="width:auto;padding:5px 10px;font-size:12px;background:#ff4d4d;">❌ Cancelar</button>
+          ` : ''}
+          <button onclick="excluir(${r.id})" style="width:auto;padding:5px 10px;font-size:12px;background:#555;">🗑️</button>
+        </td>
+      </tr>
+    `).join("") || "<tr><td colspan='6' style='text-align:center;color:#aaa;'>Nenhuma reserva</td></tr>";
+  }
+
+  async function confirmar(id) {
+    const res = await apiGetReservas();
+    const r = res.find(x => x.id === id);
+    if (r) { r.status = "Confirmada"; await apiAtualizarReserva(id, r); carregar(); }
+  }
+
+  async function cancelar(id) {
+    if (!confirm("Cancelar esta reserva?")) return;
+    const res = await apiGetReservas();
+    const r = res.find(x => x.id === id);
+    if (r) { r.status = "Cancelada"; await apiAtualizarReserva(id, r); carregar(); }
+  }
+
+  async function excluir(id) {
+    if (!confirm("Excluir?")) return;
+    await apiDeletarReserva(id);
+    carregar();
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - StreetCar ADM</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <aside class="sidebar">
+    <h2>StreetCar</h2>
+    <ul>
+      <li class="active">📊 Dashboard</li>
+      <li onclick="ir('veiculos.html')">🚗 Veículos</li>
+      <li onclick="ir('clientes.html')">👤 Clientes</li>
+      <li onclick="ir('locacoes.html')">📄 Locações</li>
+      <li onclick="ir('reservas.html')">📅 Reservas</li>
+      <li onclick="logout()">🚪 Sair</li>
+    </ul>
+    <div class="badge-perfil">👑 ADMINISTRADOR</div>
+  </aside>
+
+  <main class="main">
+
+    <div class="topo">
+      <h1>Visão Geral</h1>
+      <div id="userName" class="user"></div>
+    </div>
+
+    <div class="cards">
+      <div class="card-small destaque">
+        <div class="card-header"><span>Total Frota</span><span>🚗</span></div>
+        <h2 id="totalVeiculos">0</h2><p>Veículos</p>
+      </div>
+      <div class="card-small destaque">
+        <div class="card-header"><span>Locações</span><span>📄</span></div>
+        <h2 id="totalLocacoes">0</h2><p>Ativas</p>
+      </div>
+      <div class="card-small destaque">
+        <div class="card-header"><span>Reservas</span><span>📅</span></div>
+        <h2 id="totalReservas">0</h2><p>Pendentes</p>
+      </div>
+      <div class="card-small destaque">
+        <div class="card-header"><span>Clientes</span><span>👤</span></div>
+        <h2 id="totalClientes">0</h2><p>Cadastrados</p>
+      </div>
+    </div>
+
+    <div class="duas-tabelas">
+
+      <div class="tabela">
+        <h2>Frota</h2>
+        <table>
+          <thead><tr><th>Modelo</th><th>Placa</th><th>Diária</th><th>Status</th></tr></thead>
+          <tbody id="tabelaFrota"></tbody>
+        </table>
+      </div>
+
+      <div class="tabela">
+        <div class="topo-tabela">
+          <h2>Locações Ativas</h2>
+          <div class="acoes">
+            <button onclick="ir('locacoes.html')">+ Nova Locação</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>Cliente</th><th>Veículo</th><th>Devolução</th><th>Status</th></tr></thead>
+          <tbody id="tabelaLocacoes"></tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  const sessao = verificarLogin("ADMIN");
+  if (sessao) {
+    document.getElementById("userName").innerText = "👤 " + sessao.nome;
+    carregarDashboard();
+  }
+
+  async function carregarDashboard() {
+    const [veiculos, locacoes, reservas, usuarios] = await Promise.all([
+      apiGetVeiculos(),
+      apiGetLocacoes(),
+      apiGetReservas(),
+      apiGetUsuarios()
+    ]);
+
+    document.getElementById("totalVeiculos").innerText = veiculos.length;
+
+    const locacoesAtivas = locacoes.filter(l => l.status === "Ativa");
+    document.getElementById("totalLocacoes").innerText = locacoesAtivas.length;
+
+    const reservasPendentes = reservas.filter(r => r.status === "Pendente");
+    document.getElementById("totalReservas").innerText = reservasPendentes.length;
+
+    const clientes = usuarios.filter(u => u.perfil === "CLIENTE");
+    document.getElementById("totalClientes").innerText = clientes.length;
+
+    // Tabela frota
+    const tabelaFrota = document.getElementById("tabelaFrota");
+    tabelaFrota.innerHTML = veiculos.slice(0, 5).map(v => `
+      <tr>
+        <td>${v.modelo}</td>
+        <td>${v.placa}</td>
+        <td>R$ ${v.diaria.toFixed(2)}</td>
+        <td><span class="badge ${v.status === 'Disponível' ? 'verde' : v.status === 'Alugado' ? 'laranja' : 'cinza'}">${v.status}</span></td>
+      </tr>
+    `).join("");
+
+    // Tabela locações
+    const tabelaLoc = document.getElementById("tabelaLocacoes");
+    tabelaLoc.innerHTML = locacoesAtivas.slice(0, 5).map(l => `
+      <tr>
+        <td>${l.cliente?.nome || "-"}</td>
+        <td>${l.veiculo?.modelo || "-"}</td>
+        <td>${l.dataFim}</td>
+        <td><span class="badge verde">${l.status}</span></td>
+      </tr>
+    `).join("");
+  }
+</script>
+</body>
+</html>

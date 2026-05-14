@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - StreetCar</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="center">
+
+<div class="card">
+  <h2>StreetCar</h2>
+  <p style="color:#aaa; margin-top:-10px; margin-bottom:20px; font-size:14px;">Sistema de Locação de Veículos</p>
+
+  <input type="email" id="email" placeholder="E-mail">
+  <input type="password" id="senha" placeholder="Senha">
+
+  <button onclick="fazerLogin()">Entrar</button>
+
+  <div class="links">
+    <a href="cadastro.html">Criar conta</a>
+  </div>
+
+  <div class="links" style="margin-top:8px; font-size:12px; color:#888;">
+    <span>Admin: admin@streetcar.com / admin123</span>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  // Se já logado, redireciona
+  const sessao = getSessao();
+  if (sessao) {
+    window.location.href = sessao.perfil === "ADMIN" ? "dashboard.html" : "minha-area.html";
+  }
+
+  async function fazerLogin() {
+    const email = document.getElementById("email").value.trim();
+    const senha = document.getElementById("senha").value;
+
+    if (!email || !senha) {
+      alert("Preencha todos os campos!");
+      return;
+    }
+
+    try {
+      const usuario = await apiLogin(email, senha);
+      setSessao(usuario);
+
+      // Redireciona conforme o perfil
+      if (usuario.perfil === "ADMIN") {
+        window.location.href = "dashboard.html";
+      } else {
+        window.location.href = "minha-area.html";
+      }
+    } catch (e) {
+      alert("Email ou senha inválidos!");
+    }
+  }
+</script>
+</body>
+</html>

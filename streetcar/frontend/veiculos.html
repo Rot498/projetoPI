@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Veículos - StreetCar</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <h2>StreetCar</h2>
+    <ul>
+      <li onclick="ir('dashboard.html')">📊 Dashboard</li>
+      <li class="active">🚗 Veículos</li>
+      <li onclick="ir('clientes.html')">👤 Clientes</li>
+      <li onclick="ir('locacoes.html')">📄 Locações</li>
+      <li onclick="ir('reservas.html')">📅 Reservas</li>
+      <li onclick="logout()">🚪 Sair</li>
+    </ul>
+    <div class="badge-perfil">👑 ADMINISTRADOR</div>
+  </aside>
+  <main class="main">
+    <div class="topo">
+      <h1>Veículos</h1>
+      <div id="userName" class="user"></div>
+    </div>
+
+    <div class="tabela">
+      <h2>Adicionar Veículo</h2>
+      <div class="form-veiculo" style="flex-wrap:wrap; gap:8px;">
+        <input type="text" id="modelo" placeholder="Modelo (ex: Honda Civic)">
+        <input type="text" id="placa" placeholder="Placa (ex: ABC-1234)">
+        <input type="number" id="ano" placeholder="Ano">
+        <input type="number" id="diaria" placeholder="Diária (R$)" step="0.01">
+        <select id="status" style="background:#2c2d38;color:white;padding:10px;border-radius:8px;border:none;">
+          <option value="Disponível">Disponível</option>
+          <option value="Manutenção">Manutenção</option>
+        </select>
+        <button onclick="salvarVeiculo()" style="width:auto;padding:10px 20px;">Adicionar</button>
+      </div>
+    </div>
+
+    <div class="tabela">
+      <h2>Lista de Veículos</h2>
+      <table>
+        <thead>
+          <tr><th>Modelo</th><th>Placa</th><th>Ano</th><th>Diária</th><th>Status</th><th>Ações</th></tr>
+        </thead>
+        <tbody id="tabelaVeiculos"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  const sessao = verificarLogin("ADMIN");
+  if (sessao) {
+    document.getElementById("userName").innerText = "👤 " + sessao.nome;
+    carregar();
+  }
+
+  let editandoId = null;
+
+  async function carregar() {
+    const veiculos = await apiGetVeiculos();
+    const tbody = document.getElementById("tabelaVeiculos");
+    tbody.innerHTML = veiculos.map(v => `
+      <tr>
+        <td>${v.modelo}</td>
+        <td>${v.placa}</td>
+        <td>${v.ano}</td>
+        <td>R$ ${v.diaria.toFixed(2)}</td>
+        <td><span class="badge ${v.status === 'Disponível' ? 'verde' : v.status === 'Alugado' ? 'laranja' : 'cinza'}">${v.status}</span></td>
+        <td>
+          <button onclick="editar(${v.id},'${v.modelo}','${v.placa}',${v.ano},${v.diaria},'${v.status}')" style="width:auto;padding:5px 10px;font-size:12px;">✏️ Editar</button>
+          <button onclick="excluir(${v.id})" style="width:auto;padding:5px 10px;font-size:12px;background:#ff4d4d;">🗑️ Excluir</button>
+        </td>
+      </tr>
+    `).join("") || "<tr><td colspan='6' style='text-align:center;color:#aaa;'>Nenhum veículo cadastrado</td></tr>";
+  }
+
+  async function salvarVeiculo() {
+    const dados = {
+      modelo: document.getElementById("modelo").value.trim(),
+      placa: document.getElementById("placa").value.trim(),
+      ano: parseInt(document.getElementById("ano").value),
+      diaria: parseFloat(document.getElementById("diaria").value),
+      status: document.getElementById("status").value
+    };
+    if (!dados.modelo || !dados.placa || !dados.ano || !dados.diaria) {
+      alert("Preencha todos os campos!"); return;
+    }
+    try {
+      if (editandoId) {
+        await apiEditarVeiculo(editandoId, dados);
+        editandoId = null;
+        document.querySelector("button[onclick='salvarVeiculo()']").innerText = "Adicionar";
+      } else {
+        await apiCriarVeiculo(dados);
+      }
+      limparForm();
+      carregar();
+    } catch(e) { alert("Erro ao salvar."); }
+  }
+
+  function editar(id, modelo, placa, ano, diaria, status) {
+    editandoId = id;
+    document.getElementById("modelo").value = modelo;
+    document.getElementById("placa").value = placa;
+    document.getElementById("ano").value = ano;
+    document.getElementById("diaria").value = diaria;
+    document.getElementById("status").value = status;
+    document.querySelector("button[onclick='salvarVeiculo()']").innerText = "💾 Salvar";
+    window.scrollTo(0, 0);
+  }
+
+  async function excluir(id) {
+    if (!confirm("Excluir este veículo?")) return;
+    await apiDeletarVeiculo(id);
+    carregar();
+  }
+
+  function limparForm() {
+    ["modelo","placa","ano","diaria"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("status").value = "Disponível";
+  }
+</script>
+</body>
+</html>

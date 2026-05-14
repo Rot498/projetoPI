@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Minha Área - StreetCar</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.aberto {
+      display: flex;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <aside class="sidebar">
+    <h2>StreetCar</h2>
+    <ul>
+      <li class="active" onclick="mostrarSecao('inicio')">🏠 Minha Área</li>
+      <li onclick="mostrarSecao('veiculos')">🚗 Ver Veículos</li>
+      <li onclick="mostrarSecao('minhas-reservas')">📅 Minhas Reservas</li>
+      <li onclick="mostrarSecao('minhas-locacoes')">📄 Minhas Locações</li>
+      <li onclick="logout()">🚪 Sair</li>
+    </ul>
+    <div class="badge-perfil">👤 CLIENTE</div>
+  </aside>
+
+  <main class="main">
+
+    <div class="topo">
+      <h1 id="tituloSecao">Bem-vindo!</h1>
+      <div id="userName" class="user"></div>
+    </div>
+
+    <!-- Seção: início -->
+    <div id="secao-inicio">
+      <div class="cards">
+        <div class="card-small destaque">
+          <div class="card-header"><span>Minhas Reservas</span><span>📅</span></div>
+          <h2 id="qtdReservas">0</h2><p>Reservas</p>
+        </div>
+        <div class="card-small destaque">
+          <div class="card-header"><span>Minhas Locações</span><span>📄</span></div>
+          <h2 id="qtdLocacoes">0</h2><p>Locações</p>
+        </div>
+        <div class="card-small destaque">
+          <div class="card-header"><span>Veículos</span><span>🚗</span></div>
+          <h2 id="qtdDisponiveis">0</h2><p>Disponíveis</p>
+        </div>
+      </div>
+      <div class="tabela" style="margin-top:20px">
+        <h2>Veículos Disponíveis para Reserva</h2>
+        <table>
+          <thead><tr><th>Modelo</th><th>Placa</th><th>Ano</th><th>Diária</th><th>Ação</th></tr></thead>
+          <tbody id="tabelaDisponiveis"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Seção: veículos -->
+    <div id="secao-veiculos" style="display:none">
+      <div class="tabela">
+        <h2>Todos os Veículos</h2>
+        <table>
+          <thead><tr><th>Modelo</th><th>Placa</th><th>Ano</th><th>Diária</th><th>Status</th><th>Ação</th></tr></thead>
+          <tbody id="tabelaVeiculosTodos"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Seção: minhas reservas -->
+    <div id="secao-minhas-reservas" style="display:none">
+      <div class="tabela">
+        <h2>Minhas Reservas</h2>
+        <table>
+          <thead><tr><th>Veículo</th><th>Início</th><th>Fim</th><th>Status</th><th>Ação</th></tr></thead>
+          <tbody id="tabelaMinhasReservas"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Seção: minhas locações -->
+    <div id="secao-minhas-locacoes" style="display:none">
+      <div class="tabela">
+        <h2>Minhas Locações</h2>
+        <table>
+          <thead><tr><th>Veículo</th><th>Início</th><th>Fim</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody id="tabelaMinhasLocacoes"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal: fazer reserva (bug corrigido: sem display:none + display:flex no mesmo elemento) -->
+    <div id="modal-reserva" class="modal-overlay">
+      <div class="card" style="width:360px;">
+        <h2>Fazer Reserva</h2>
+        <p id="modal-veiculo-info" style="color:#F1560A; margin-bottom:10px;"></p>
+        <input type="hidden" id="modal-veiculo-id">
+        <label style="font-size:12px; color:#aaa;">Data de Início</label>
+        <input type="date" id="res-inicio">
+        <label style="font-size:12px; color:#aaa; margin-top:8px; display:block;">Data de Fim</label>
+        <input type="date" id="res-fim">
+        <button onclick="confirmarReserva()" style="margin-top:14px;">Confirmar Reserva</button>
+        <button onclick="fecharModal()" style="margin-top:8px; background:#555;">Cancelar</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  const sessao = verificarLogin("CLIENTE");
+
+  if (sessao) {
+    document.getElementById("userName").innerText = "👤 " + sessao.nome;
+    carregarInicio();
+  }
+
+  function mostrarSecao(secao) {
+    document.querySelectorAll("[id^='secao-']").forEach(el => el.style.display = "none");
+    document.getElementById("secao-" + secao).style.display = "block";
+
+    const titulos = {
+      "inicio": "Bem-vindo, " + sessao.nome + "!",
+      "veiculos": "Veículos Disponíveis",
+      "minhas-reservas": "Minhas Reservas",
+      "minhas-locacoes": "Minhas Locações"
+    };
+    document.getElementById("tituloSecao").innerText = titulos[secao] || "Minha Área";
+
+    // Atualiza item ativo no menu
+    document.querySelectorAll(".sidebar li").forEach(li => li.classList.remove("active"));
+    event.currentTarget && event.currentTarget.classList.add("active");
+
+    if (secao === "veiculos") carregarTodosVeiculos();
+    if (secao === "minhas-reservas") carregarMinhasReservas();
+    if (secao === "minhas-locacoes") carregarMinhasLocacoes();
+  }
+
+  async function carregarInicio() {
+    try {
+      const [reservas, locacoes, veiculosDisp] = await Promise.all([
+        apiGetReservasCliente(sessao.id),
+        apiGetLocacoesCliente(sessao.id),
+        apiGetVeiculosDisponiveis()
+      ]);
+
+      document.getElementById("qtdReservas").innerText = reservas.length;
+      document.getElementById("qtdLocacoes").innerText = locacoes.length;
+      document.getElementById("qtdDisponiveis").innerText = veiculosDisp.length;
+
+      const tbody = document.getElementById("tabelaDisponiveis");
+      tbody.innerHTML = veiculosDisp.map(v => `
+        <tr>
+          <td>${v.modelo}</td>
+          <td>${v.placa}</td>
+          <td>${v.ano}</td>
+          <td>R$ ${v.diaria.toFixed(2)}</td>
+          <td><button onclick="abrirReserva(${v.id}, '${v.modelo}')" style="width:auto;padding:5px 12px;font-size:12px;">Reservar</button></td>
+        </tr>
+      `).join("") || "<tr><td colspan='5' style='text-align:center;color:#aaa;'>Nenhum veículo disponível</td></tr>";
+
+      document.getElementById("tituloSecao").innerText = "Bem-vindo, " + sessao.nome + "!";
+    } catch(e) {
+      console.error("Erro ao carregar início:", e);
+    }
+  }
+
+  async function carregarTodosVeiculos() {
+    const veiculos = await apiGetVeiculos();
+    const tbody = document.getElementById("tabelaVeiculosTodos");
+    tbody.innerHTML = veiculos.map(v => `
+      <tr>
+        <td>${v.modelo}</td>
+        <td>${v.placa}</td>
+        <td>${v.ano}</td>
+        <td>R$ ${v.diaria.toFixed(2)}</td>
+        <td><span class="badge ${v.status === 'Disponível' ? 'verde' : 'laranja'}">${v.status}</span></td>
+        <td>${v.status === 'Disponível' ? `<button onclick="abrirReserva(${v.id}, '${v.modelo}')" style="width:auto;padding:5px 12px;font-size:12px;">Reservar</button>` : '-'}</td>
+      </tr>
+    `).join("");
+  }
+
+  async function carregarMinhasReservas() {
+    const reservas = await apiGetReservasCliente(sessao.id);
+    const tbody = document.getElementById("tabelaMinhasReservas");
+    tbody.innerHTML = reservas.map(r => `
+      <tr>
+        <td>${r.veiculo?.modelo || "-"}</td>
+        <td>${r.dataInicio}</td>
+        <td>${r.dataFim}</td>
+        <td><span class="badge ${r.status === 'Pendente' ? 'laranja' : r.status === 'Confirmada' ? 'verde' : 'cinza'}">${r.status}</span></td>
+        <td>${r.status === 'Pendente' ? `<button onclick="cancelarReserva(${r.id})" style="width:auto;padding:5px 12px;font-size:12px;background:#ff4d4d;">Cancelar</button>` : '-'}</td>
+      </tr>
+    `).join("") || "<tr><td colspan='5' style='text-align:center;color:#aaa;'>Nenhuma reserva encontrada</td></tr>";
+  }
+
+  async function carregarMinhasLocacoes() {
+    const locacoes = await apiGetLocacoesCliente(sessao.id);
+    const tbody = document.getElementById("tabelaMinhasLocacoes");
+    tbody.innerHTML = locacoes.map(l => `
+      <tr>
+        <td>${l.veiculo?.modelo || "-"}</td>
+        <td>${l.dataInicio}</td>
+        <td>${l.dataFim}</td>
+        <td>R$ ${l.valorTotal?.toFixed(2) || "0.00"}</td>
+        <td><span class="badge ${l.status === 'Ativa' ? 'verde' : 'cinza'}">${l.status}</span></td>
+      </tr>
+    `).join("") || "<tr><td colspan='5' style='text-align:center;color:#aaa;'>Nenhuma locação encontrada</td></tr>";
+  }
+
+  function abrirReserva(veiculoId, modelo) {
+    document.getElementById("modal-veiculo-id").value = veiculoId;
+    document.getElementById("modal-veiculo-info").innerText = "Veículo: " + modelo;
+    document.getElementById("res-inicio").value = "";
+    document.getElementById("res-fim").value = "";
+    document.getElementById("modal-reserva").classList.add("aberto");
+  }
+
+  function fecharModal() {
+    document.getElementById("modal-reserva").classList.remove("aberto");
+  }
+
+  async function confirmarReserva() {
+    const veiculoId = document.getElementById("modal-veiculo-id").value;
+    const inicio = document.getElementById("res-inicio").value;
+    const fim = document.getElementById("res-fim").value;
+
+    if (!inicio || !fim) { alert("Preencha as datas!"); return; }
+    if (fim <= inicio) { alert("Data de fim deve ser após o início!"); return; }
+
+    try {
+      await apiCriarReserva({
+        cliente: { id: sessao.id },
+        veiculo: { id: parseInt(veiculoId) },
+        dataInicio: inicio,
+        dataFim: fim,
+        status: "Pendente"
+      });
+      fecharModal();
+      alert("Reserva feita com sucesso! Aguarde confirmação.");
+      carregarInicio();
+    } catch (e) {
+      alert("Erro ao fazer reserva: " + e.message);
+    }
+  }
+
+  async function cancelarReserva(id) {
+    if (!confirm("Cancelar esta reserva?")) return;
+    try {
+      const reservas = await apiGetReservasCliente(sessao.id);
+      const r = reservas.find(x => x.id === id);
+      if (r) {
+        r.status = "Cancelada";
+        await apiAtualizarReserva(id, r);
+        carregarMinhasReservas();
+      }
+    } catch(e) {
+      alert("Erro ao cancelar reserva.");
+    }
+  }
+</script>
+</body>
+</html>

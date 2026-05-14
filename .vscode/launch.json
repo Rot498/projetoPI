@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-StreetCarApplication<streetcar>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.streetcar.StreetCarApplication",
+            "projectName": "streetcar",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

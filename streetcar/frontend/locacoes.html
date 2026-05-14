@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Locações - StreetCar</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <h2>StreetCar</h2>
+    <ul>
+      <li onclick="ir('dashboard.html')">📊 Dashboard</li>
+      <li onclick="ir('veiculos.html')">🚗 Veículos</li>
+      <li onclick="ir('clientes.html')">👤 Clientes</li>
+      <li class="active">📄 Locações</li>
+      <li onclick="ir('reservas.html')">📅 Reservas</li>
+      <li onclick="logout()">🚪 Sair</li>
+    </ul>
+    <div class="badge-perfil">👑 ADMINISTRADOR</div>
+  </aside>
+  <main class="main">
+    <div class="topo">
+      <h1>Locações</h1>
+      <div id="userName" class="user"></div>
+    </div>
+
+    <div class="tabela">
+      <h2>Nova Locação</h2>
+      <div class="form-locacao">
+        <div>
+          <label style="font-size:12px;color:#aaa;">Cliente</label>
+          <select id="clienteId" style="background:#2c2d38;color:white;padding:10px;border-radius:8px;border:none;min-width:200px;display:block;margin-top:4px;"></select>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#aaa;">Veículo</label>
+          <select id="veiculoId" style="background:#2c2d38;color:white;padding:10px;border-radius:8px;border:none;min-width:200px;display:block;margin-top:4px;"></select>
+        </div>
+        <div class="campo-data">
+          <label>Data Início</label>
+          <input type="date" id="dataInicio">
+        </div>
+        <div class="campo-data">
+          <label>Data Fim</label>
+          <input type="date" id="dataFim">
+        </div>
+        <button onclick="criarLocacao()" style="width:auto;padding:10px 20px;align-self:flex-end;">+ Criar Locação</button>
+      </div>
+    </div>
+
+    <div class="tabela">
+      <h2>Lista de Locações</h2>
+      <table>
+        <thead>
+          <tr><th>Cliente</th><th>Veículo</th><th>Início</th><th>Fim</th><th>Total</th><th>Status</th><th>Ações</th></tr>
+        </thead>
+        <tbody id="tabelaLocacoes"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  const sessao = verificarLogin("ADMIN");
+  if (sessao) {
+    document.getElementById("userName").innerText = "👤 " + sessao.nome;
+    carregarSelects();
+    carregar();
+  }
+
+  async function carregarSelects() {
+    const [usuarios, veiculos] = await Promise.all([apiGetUsuarios(), apiGetVeiculosDisponiveis()]);
+    const clientes = usuarios.filter(u => u.perfil === "CLIENTE");
+
+    const selC = document.getElementById("clienteId");
+    selC.innerHTML = clientes.map(c => `<option value="${c.id}">${c.nome}</option>`).join("") || "<option>Nenhum cliente</option>";
+
+    const selV = document.getElementById("veiculoId");
+    selV.innerHTML = veiculos.map(v => `<option value="${v.id}" data-diaria="${v.diaria}">${v.modelo} - ${v.placa} (R$ ${v.diaria}/dia)</option>`).join("") || "<option>Nenhum veículo disponível</option>";
+  }
+
+  async function criarLocacao() {
+    const clienteId = document.getElementById("clienteId").value;
+    const veiculoId = document.getElementById("veiculoId").value;
+    const inicio = document.getElementById("dataInicio").value;
+    const fim = document.getElementById("dataFim").value;
+
+    if (!clienteId || !veiculoId || !inicio || !fim) { alert("Preencha todos os campos!"); return; }
+    if (fim <= inicio) { alert("Data de fim deve ser após o início!"); return; }
+
+    const opt = document.querySelector(`#veiculoId option[value="${veiculoId}"]`);
+    const diaria = parseFloat(opt.dataset.diaria);
+    const dias = Math.ceil((new Date(fim) - new Date(inicio)) / 86400000);
+    const total = dias * diaria;
+
+    try {
+      await apiCriarLocacao({
+        cliente: { id: parseInt(clienteId) },
+        veiculo: { id: parseInt(veiculoId) },
+        dataInicio: inicio,
+        dataFim: fim,
+        status: "Ativa",
+        valorTotal: total
+      });
+      alert(`Locação criada! Total: R$ ${total.toFixed(2)} (${dias} dias)`);
+      carregarSelects();
+      carregar();
+    } catch(e) { alert("Erro ao criar locação."); }
+  }
+
+  async function carregar() {
+    const locacoes = await apiGetLocacoes();
+    const tbody = document.getElementById("tabelaLocacoes");
+    tbody.innerHTML = locacoes.map(l => `
+      <tr>
+        <td>${l.cliente?.nome || "-"}</td>
+        <td>${l.veiculo?.modelo || "-"}</td>
+        <td>${l.dataInicio}</td>
+        <td>${l.dataFim}</td>
+        <td>R$ ${l.valorTotal?.toFixed(2) || "0.00"}</td>
+        <td><span class="badge ${l.status === 'Ativa' ? 'verde' : 'cinza'}">${l.status}</span></td>
+        <td>
+          ${l.status === 'Ativa' ? `<button onclick="encerrar(${l.id})" style="width:auto;padding:5px 10px;font-size:12px;">✅ Encerrar</button>` : ''}
+          <button onclick="excluir(${l.id})" style="width:auto;padding:5px 10px;font-size:12px;background:#ff4d4d;">🗑️</button>
+        </td>
+      </tr>
+    `).join("") || "<tr><td colspan='7' style='text-align:center;color:#aaa;'>Nenhuma locação</td></tr>";
+  }
+
+  async function encerrar(id) {
+    if (!confirm("Encerrar esta locação?")) return;
+    await apiEncerrarLocacao(id);
+    carregarSelects();
+    carregar();
+  }
+
+  async function excluir(id) {
+    if (!confirm("Excluir esta locação?")) return;
+    await apiDeletarLocacao(id);
+    carregarSelects();
+    carregar();
+  }
+</script>
+</body>
+</html>

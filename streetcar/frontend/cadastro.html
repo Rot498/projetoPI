@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro - StreetCar</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="center">
+
+<div class="card">
+  <h2>Criar Conta</h2>
+
+  <input type="text" id="nome" placeholder="Nome completo">
+  <input type="email" id="email" placeholder="E-mail">
+  <input type="text" id="telefone" placeholder="Telefone">
+  <input type="password" id="senha" placeholder="Senha">
+
+  <button onclick="cadastrar()">Cadastrar</button>
+
+  <div class="links">
+    <a href="login.html">Já tenho conta</a>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  async function cadastrar() {
+    const nome = document.getElementById("nome").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const telefone = document.getElementById("telefone").value.trim();
+    const senha = document.getElementById("senha").value;
+
+    if (!nome || !email || !senha) {
+      alert("Preencha os campos obrigatórios!");
+      return;
+    }
+
+    try {
+      await apiCadastro({ nome, email, telefone, senha });
+      alert("Cadastro realizado! Faça login.");
+      window.location.href = "login.html";
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+</script>
+</body>
+</html>

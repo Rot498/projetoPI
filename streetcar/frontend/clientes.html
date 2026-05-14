@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Clientes - StreetCar</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <h2>StreetCar</h2>
+    <ul>
+      <li onclick="ir('dashboard.html')">📊 Dashboard</li>
+      <li onclick="ir('veiculos.html')">🚗 Veículos</li>
+      <li class="active">👤 Clientes</li>
+      <li onclick="ir('locacoes.html')">📄 Locações</li>
+      <li onclick="ir('reservas.html')">📅 Reservas</li>
+      <li onclick="logout()">🚪 Sair</li>
+    </ul>
+    <div class="badge-perfil">👑 ADMINISTRADOR</div>
+  </aside>
+  <main class="main">
+    <div class="topo">
+      <h1>Clientes</h1>
+      <div id="userName" class="user"></div>
+    </div>
+
+    <div class="tabela">
+      <h2>Adicionar Cliente</h2>
+      <div class="form-veiculo" style="flex-wrap:wrap; gap:8px;">
+        <input type="text" id="nome" placeholder="Nome completo">
+        <input type="email" id="email" placeholder="E-mail">
+        <input type="text" id="telefone" placeholder="Telefone">
+        <input type="password" id="senha" placeholder="Senha">
+        <select id="perfil" style="background:#2c2d38;color:white;padding:10px;border-radius:8px;border:none;">
+          <option value="CLIENTE">Cliente</option>
+          <option value="ADMIN">Admin</option>
+        </select>
+        <button onclick="salvar()" style="width:auto;padding:10px 20px;">Adicionar</button>
+      </div>
+    </div>
+
+    <div class="tabela">
+      <h2>Lista de Usuários</h2>
+      <table>
+        <thead>
+          <tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Perfil</th><th>Ações</th></tr>
+        </thead>
+        <tbody id="tabelaClientes"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+  const sessao = verificarLogin("ADMIN");
+  if (sessao) {
+    document.getElementById("userName").innerText = "👤 " + sessao.nome;
+    carregar();
+  }
+
+  let editandoId = null;
+
+  async function carregar() {
+    const usuarios = await apiGetUsuarios();
+    const tbody = document.getElementById("tabelaClientes");
+    tbody.innerHTML = usuarios.map(u => `
+      <tr>
+        <td>${u.nome}</td>
+        <td>${u.email}</td>
+        <td>${u.telefone || "-"}</td>
+        <td><span class="badge ${u.perfil === 'ADMIN' ? 'laranja' : 'verde'}">${u.perfil}</span></td>
+        <td>
+          <button onclick="editar(${u.id},'${u.nome}','${u.email}','${u.telefone || ''}','${u.perfil}')" style="width:auto;padding:5px 10px;font-size:12px;">✏️ Editar</button>
+          <button onclick="excluir(${u.id})" style="width:auto;padding:5px 10px;font-size:12px;background:#ff4d4d;">🗑️ Excluir</button>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  async function salvar() {
+    const dados = {
+      nome: document.getElementById("nome").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      telefone: document.getElementById("telefone").value.trim(),
+      senha: document.getElementById("senha").value,
+      perfil: document.getElementById("perfil").value
+    };
+    if (!dados.nome || !dados.email) { alert("Nome e e-mail são obrigatórios!"); return; }
+
+    try {
+      if (editandoId) {
+        await apiEditarUsuario(editandoId, dados);
+        editandoId = null;
+        document.querySelector("button[onclick='salvar()']").innerText = "Adicionar";
+      } else {
+        if (!dados.senha) { alert("Senha obrigatória!"); return; }
+        await apiCriarUsuario(dados);
+      }
+      limparForm();
+      carregar();
+    } catch(e) { alert("Erro ao salvar."); }
+  }
+
+  function editar(id, nome, email, telefone, perfil) {
+    editandoId = id;
+    document.getElementById("nome").value = nome;
+    document.getElementById("email").value = email;
+    document.getElementById("telefone").value = telefone;
+    document.getElementById("perfil").value = perfil;
+    document.getElementById("senha").value = "";
+    document.querySelector("button[onclick='salvar()']").innerText = "💾 Salvar";
+    window.scrollTo(0, 0);
+  }
+
+  async function excluir(id) {
+    if (id === sessao.id) { alert("Não pode excluir a si mesmo!"); return; }
+    if (!confirm("Excluir este usuário?")) return;
+    await apiDeletarUsuario(id);
+    carregar();
+  }
+
+  function limparForm() {
+    ["nome","email","telefone","senha"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("perfil").value = "CLIENTE";
+  }
+</script>
+</body>
+</html>

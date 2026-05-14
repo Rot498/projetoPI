@@ -1,0 +1,263 @@
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #1e1e2f;
+  color: white;
+}
+
+/* CENTRALIZAÇÃO LOGIN */
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* CARD LOGIN/CADASTRO */
+.card {
+  background: #393A43;
+  padding: 30px;
+  border-radius: 12px;
+  width: 300px;
+  text-align: center;
+}
+
+.card h2 {
+  color: #F1560A;
+}
+
+/* INPUT GLOBAL */
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: none;
+  box-sizing: border-box;
+  background: #2c2d38;
+  color: white;
+}
+
+input::placeholder { color: #888; }
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: #F1560A;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 14px;
+}
+
+button:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+/* LINKS */
+.links { margin-top: 15px; }
+.links a { color: #F1560A; text-decoration: none; font-size: 14px; }
+
+/* DASHBOARD */
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  background: #333333;
+  min-height: 100vh;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+}
+
+.sidebar h2 {
+  color: #F1560A;
+  margin: 0 0 15px 0;
+  font-size: 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+}
+
+.sidebar li {
+  margin: 3px 0;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar li:hover { background: #444; }
+.sidebar .active { background: #1f1f1f; color: #F1560A; }
+
+/* Badge de perfil na sidebar */
+.badge-perfil {
+  margin-top: 20px;
+  padding: 8px;
+  background: #1f1f1f;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 12px;
+  color: #F1560A;
+  font-weight: bold;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 25px;
+  overflow-x: hidden;
+}
+
+/* TOPO */
+.topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.user {
+  background: #333;
+  padding: 8px 15px;
+  border-radius: 20px;
+}
+
+/* CARDS */
+.cards {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.card-small {
+  background: #393A43;
+  padding: 20px;
+  border-radius: 10px;
+  flex: 1;
+  min-width: 130px;
+}
+
+.card-small.destaque {
+  border-left: 4px solid #F1560A;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.card-small h2 { margin: 10px 0 5px; }
+
+/* TABELAS */
+.duas-tabelas {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.tabela {
+  flex: 1;
+  min-width: 0;
+  background: #393A43;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.topo-tabela {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topo-tabela .acoes { display: flex; gap: 10px; }
+.topo-tabela button { width: auto; padding: 6px 12px; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+th { color: #F1560A; }
+thead tr { border-bottom: 1px solid #555; }
+tbody tr { border-bottom: 1px solid #444; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+/* BADGES */
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.verde   { background: #00c853; color: #fff; }
+.laranja { background: #F1560A; color: #fff; }
+.cinza   { background: #666;    color: #fff; }
+
+/* FORMS */
+.form-veiculo,
+.form-cliente {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.form-veiculo input,
+.form-cliente input { flex: 1; }
+
+.form-locacao {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.campo-data {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.campo-data label { font-size: 11px; color: #aaa; }
+.campo-data input {
+  background: #2c2d38;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  width: 150px;
+}
+
+/* BOTÕES DE AÇÃO */
+button + button { margin-top: 4px; }
